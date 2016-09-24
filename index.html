@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+    </body>
+    <script>
+        var option = {
+            id: '#canvas',
+            left: 0,
+            top: 0,
+            width: 200,
+            height: 200,
+            column: 10,
+            row: 10
+        };
+        
+        class Color {
+            constructor(r, g, b, a) {
+                this.r = r;
+                this.g = g;
+                this.b = b;
+                this.a = a;
+                this.color = this.toString();
+            }
+            toString() {
+                return 'rgba(' + this.r + ',' + this.g + ',' + this.b + ',' + this.a + ')';
+            }
+        }
+        
+        class Worksheet {
+            constructor(option) {
+                this.option = option;
+                this.element = document.querySelector(option.id);
+                this.context = this.element.getContext('2d');
+                this.origin_x = this.option.left;
+                this.origin_y = this.option.top;
+                this.width = this.option.width;
+                this.height = this.option.height;
+                this.x_gap = this.width / this.option.column;
+                this.y_gap = this.height / this.option.row;
+                this.column = this.option.column;
+                this.row = this.option.row;
+                this.blocks = Array(this.row);
+                for (var i = 0; i < this.row; i++) {
+                    this.blocks[i] = new Array(this.column);
+                    for (var j = 0; j < this.column; j++) {
+                        this.blocks[i][j] = new Color(0,0,0,0);
+                    }
+                }
+                this.init();
+            }
+            
+            init() {
+                this.element.width = this.option.width;
+                this.element.height = this.option.height;
+                this.element.addEventListener('click', (e) => {
+                    var x = e.pageX - this.element.offsetLeft;
+                    var y = e.pageY - this.element.offsetTop;
+                    this.onClick(x, y);
+                });
+            }
+            
+            renderWorkspace() {
+                var ctx = this.context;
+                var origin_x = this.origin_x;
+                var origin_y = this.origin_y;
+                var width = this.width;
+                var height = this.height;
+                var x_gap = this.x_gap;
+                var y_gap = this.y_gap;
+                var column = this.column;
+                var row = this.row;
+                
+                ctx.beginPath();
+                var acc = 0;
+                for (var i = 0; i < row; i += 1) {
+                    ctx.moveTo(origin_x, origin_y + i * y_gap);
+                    ctx.lineTo(origin_x + width, origin_y + i * y_gap);
+                }
+                for (var i = 0; i < column; i += 1) {
+                    ctx.moveTo(origin_x + i * x_gap, origin_y);
+                    ctx.lineTo(origin_x + i * x_gap, origin_y + height);
+                }
+                ctx.stroke();
+            }
+            
+            onClick(x, y) {
+                var x_gap = this.x_gap;
+                var y_gap = this.y_gap;
+                var workspace_x = x - this.option.left;
+                var workspace_y = y - this.option.top;
+                var corner_y = workspace_y % y_gap;
+                var corner_x = workspace_x % x_gap;
+                this.context.fillStyle = '#000';
+                var block_x = Math.floor(workspace_x / x_gap);
+                var block_y = Math.floor(workspace_y / y_gap);
+                this.blocks[block_y][block_x] = new Color(0, 0, 100, 100);
+                this.context.fillRect(x - corner_x, y - corner_y, x_gap, y_gap);
+            }
+            
+            renderBlocks() {
+                for (var i = 0; i < this.row; i++ ) {
+                    var row = this.blocks[i];
+                    for (var j = 0; j < this.column; j++) {
+                        this.context.fillStyle = row[j].color;
+                        this.context.fillRect(j * this.y_gap, i * this.x_gap, this.x_gap, this.y_gap);
+                    }
+                }
+            }
+        }
+        
+        var worksheet = new Worksheet(option);
+        worksheet.renderWorkspace();
+        
+    </script>
+</html>
