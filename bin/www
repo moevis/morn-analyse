@@ -3,10 +3,10 @@
 /**
  * Module dependencies.
  */
-
+var fs = require('fs');
 var app = require('../app');
 var debug = require('debug')('morn-analyse:server');
-var http = require('http');
+var https = require('https');
 
 /**
  * Get port from environment and store in Express.
@@ -19,7 +19,10 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+var server = https.createServer({
+  key: fs.readFileSync(__dirname + '/pem.key'),
+  cert: fs.readFileSync(__dirname + '/pem.crt')
+}, app);
 
 /**
  * Listen on provided port, on all network interfaces.
