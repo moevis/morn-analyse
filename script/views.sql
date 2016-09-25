@@ -1,4 +1,4 @@
 create table views (
-	ip varchar(16) primary key,
+	ip varchar(64) primary key,
 	times int not null
 );
