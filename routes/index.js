@@ -10,9 +10,9 @@ router.get('/', function(req, res, next) {
 		var times = 1;
 		if (data) {
 			times = data.times;
-			sql.none('update views set times = times + 1 where ip = $1', [req.ip]);
+			sql.none('UPDATE views SET times = times + 1 WHERE ip = $1', [req.ip]);
 		} else {
-			sql.none('insert into views(ip, times) values($1, $2)', [req.ip, 1]);
+			sql.none('INSERT INT views(ip, times) VALUES($1, $2)', [req.ip, 1]);
 		}
 		res.json({
 			views: times
